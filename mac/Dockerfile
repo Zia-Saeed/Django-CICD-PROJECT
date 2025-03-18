@@ -19,4 +19,4 @@ COPY . .
 EXPOSE 8000
 
 # Run the application
-CMD ["python3 manage.py runserver"]
+CMD ["cd mac", "python3 manage.py runserver"]
