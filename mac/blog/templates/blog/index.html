@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Blog Homepage</title>
+    <link rel="stylesheet" href="styles.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    {% load static %}
+    <link rel="stylesheet" href="{% static 'blog/home.css' %}">
+</head>
+<body>
+    <!-- Header Section -->
+    <header class="site-header">
+        <div class="container">
+            <h1 class="logo">My<span>Blog</span></h1>
+            <nav class="main-nav">
+                <ul>
+                    <li><a href="#">Home</a></li>
+                    <li><a href="#">About</a></li>
+                    <li><a href="#">Categories</a></li>
+                    <li><a href="#">Contact</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Hero Section -->
+    <section class="hero">
+        <div class="container">
+            <h2>Welcome to My Blog</h2>
+            <p>Your go-to place for insightful articles, tutorials, and stories.</p>
+            <a href="#" class="btn">Explore Now</a>
+        </div>
+    </section>
+
+    <!-- Featured Posts Section -->
+    <section class="featured-posts">
+        <div class="container">
+            <h2 class="section-title">Featured Posts</h2>
+            <div class="posts-grid">
+                <article class="post-card">
+                    <img src="https://tse3.mm.bing.net/th?id=OIP.BibxFDe8Rt0MG-wA9gbQtgHaD8&pid=Api&P=0&h=220/300x200" alt="Post 1">
+                    <h3>How to Master Python in 30 Days</h3>
+                    <p>Learn the fundamentals of Python programming with practical examples and exercises.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+                <article class="post-card">
+                    <img src=https://tse1.mm.bing.net/th?id=OIP.VHunELH2p08LU5OilDooawHaD3&pid=Api&P=0&h=220/300x200" alt="Post 2">
+                    <h3>The Art of Writing Clean Code</h3>
+                    <p>Discover best practices for writing maintainable and efficient code.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+                <article class="post-card">
+                    <img src="https://tse2.mm.bing.net/th?id=OIP.vLJgk4utuBDxbhYIuerGoQAAAA&pid=Api&P=0&h=220/300x200" alt="Post 3">
+                    <h3>Top 10 Productivity Hacks for Developers</h3>
+                    <p>Boost your productivity with these proven tips and tools.</p>
+                    <a href="#" class="read-more">Read More</a>
+                </article>
+            </div>
+        </div>
+    </section>
+
+    <!-- Footer Section -->
+    <footer class="site-footer">
+        <div class="container">
+            <p>&copy; 2023 MyBlog. All rights reserved.</p>
+        </div>
+    </footer>
+</body>
+</html>
