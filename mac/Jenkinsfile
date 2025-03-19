@@ -49,16 +49,18 @@ pipeline {
         }
         stage ("Updates Kubernetes Manifest") {
             steps {
-                sh """
-                sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_D}|g' kubernetes/deployment.yml
-                """
-                sh """
-                git config --global user.name "Zia-Saeed"
-                git config --global user.email "zia.aseh@gmail.com"
-                git add kubernetes/deployment.yml
-                git commit -m "Update image tag to ${env.BUILD_ID}"
-                git push origin main
-                """
+                withCredentials([string(credentialsId: "github-token", variable: "GITHUB_TOKEN")]){
+                    sh """
+                    sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_D}|g' kubernetes/deployment.yml
+                    """
+                    sh """
+                    git config --global user.name "Zia-Saeed"
+                    git config --global user.email "zia.aseh@gmail.com"
+                    git add kubernetes/deployment.yml
+                    git commit -m "Update image tag to ${env.BUILD_ID}"
+                    git push https://${GITHUB_TOKEN}@github.com/Zia-Saeed/Django-CICD-PROJECT HEAD:main
+                    """
+                }
             }
         }
 
