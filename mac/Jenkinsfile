@@ -26,7 +26,14 @@ pipeline {
                 }
             }
         }
+    stages {
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image "docker:dind" // Use Docker-in-Docker for this stage
+                    args "--privileged --user root -v /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 dir('mac') {
                     script {
