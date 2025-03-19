@@ -1,0 +1,73 @@
+pipeline {
+    agent {
+        docker {
+            image "python3:3.13-slim"
+            args "-v /var/run/docker.sock:/var/run/docker.sock"
+        }
+    }
+    environment {
+        DJANGO_SETTINGS_MODULE = "mac.settings"
+        DATABASE_URL = "sqlite://db.sqlite3"
+    }
+    stages {
+            stage('Build') {
+                steps {
+                    git branch: "main", url: ""
+                }
+        }
+        stage ("Install Dependencies") {
+            steps {
+                sh 'pip install -r requirements.txt'
+            }
+        }
+        stage ("SonarQube Analysis") {
+            steps {
+                withSonarQubeEnv('SonarQube') {
+                    sh "sonar-scanner"
+                }
+            }
+        }
+        stage ("Build Docker Image") {
+            steps {
+                script {
+                    dockerImage = docker.build("ziasaeeditgeek/")
+                }
+            }
+        }
+        stage ("Push Docker Image") {
+                steps {
+                    script {
+                    //     docker.withRegistry('https://index.docker.io/v1/', 'dockerhub') {
+                    //         dockerImage.push
+                    // }
+                    docker.withRegistry("", ""){
+                        dockerImage.push()
+                    }
+                }
+            }
+        }
+        stage ("Updates Kubernetes Manifest") {
+            steps {
+                sh """
+                sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_D}|g' kubernetes/deployment.yml
+                """
+                sh """
+                git config --global user.name "Zia-Saeed"
+                git config --global user.email "zia.aseh@gmail.com"
+                git add kubernetes/deployment.yml
+                git commit -m "Update image tag to ${env.BUILD_ID}"
+                git push origin main
+                """
+            }
+        }
+
+    }
+    post {
+        success {
+            echo "Pipeline Succeeded!"
+        }
+        failure {
+            echo "Pipeline Failed"
+        }
+    }
+}
