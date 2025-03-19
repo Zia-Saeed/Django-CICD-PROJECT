@@ -1,8 +1,8 @@
 pipeline {
     agent {
         docker {
-            image "docker:dind"
-            args "--privileged --user root -v /var/run/docker.sock:/var/run/docker.sock"
+            image "python:3.12-slim" // Default agent for most stages
+            args "--user root"
         }
     }
     environment {
@@ -11,32 +11,34 @@ pipeline {
         DOCKER_IMAGE = "ziasaeeditgeek/django-cicd-project"
     }
     stages {
-            stage('Build') {
-                steps {
+        stage('Build') {
+            steps {
+                dir('django-cicd-project') {
                     git branch: "main", url: "https://github.com/Zia-Saeed/Django-CICD-PROJECT"
                 }
+            }
+        }
+        stage('Debug Workspace') {
+            steps {
+                sh 'ls -la' // Debug workspace contents
+                sh 'ls -la django-cicd-project/mac' // Debug the mac directory
+            }
         }
         stage('Install Dependencies') {
-            agent{
-                docker {
-                    image "python:3.12-slim" // Default agent for most stages
-                    args "--user root"
-                }
-            }
             steps {
-                dir('mac/') { // Navigate to the correct directory
-                    sh 'pip install -r requirements.txt'
+                dir('mac') {
+                    sh 'pip install --upgrade pip'
+                    sh 'pip install --default-timeout=100 -r requirements.txt'
                 }
             }
         }
-        // stage ("SonarQube Analysis") {
-        //     steps {
-        //         withSonarQubeEnv('SonarQube') {
-        //             sh "sonar-scanner"
-        //         }
-        //     }
-        // }
         stage('Build Docker Image') {
+            agent {
+                docker {
+                    image "docker:dind" // Use Docker-in-Docker for this stage
+                    args "--privileged --user root -v /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 dir('mac') {
                     script {
@@ -46,6 +48,12 @@ pipeline {
             }
         }
         stage('Push Docker Image') {
+            agent {
+                docker {
+                    image "docker:dind" // Use Docker-in-Docker for this stage
+                    args "--privileged --user root -v /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 script {
                     docker.withRegistry("https://index.docker.io/v1/", "docker-cred") {
@@ -54,11 +62,11 @@ pipeline {
                 }
             }
         }
-        stage ("Updates Kubernetes Manifest") {
+        stage('Update Kubernetes Manifest') {
             steps {
-                withCredentials([string(credentialsId: "github-token", variable: "GITHUB_TOKEN")]){
+                withCredentials([string(credentialsId: "github-token", variable: "GITHUB_TOKEN")]) {
                     sh """
-                    sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_D}|g' kubernetes/deployment.yml
+                    sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_ID}|g' kubernetes/deployment.yml
                     """
                     sh """
                     git config --global user.name "Zia-Saeed"
@@ -70,7 +78,6 @@ pipeline {
                 }
             }
         }
-
     }
     post {
         success {
