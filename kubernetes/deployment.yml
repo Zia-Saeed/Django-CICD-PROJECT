@@ -16,6 +16,6 @@ spec:
     spec:
       containers:
       - name: django-app
-        image: ziasaeeditgeek/django-application:1
+        image: ziasaeeditgeek/django-application:10
         ports:
         - containerPort: 8000
