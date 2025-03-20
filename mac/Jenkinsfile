@@ -1,10 +1,10 @@
 pipeline {
-    agent {
-        docker{
-            image "python:3.12" // Default agent for most stages
-            args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
-        }
-    }
+    // agent {
+    //     docker{
+    //         image "python:3.12" // Default agent for most stages
+    //         args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+    //     }
+    // }
     environment {
         DJANGO_SETTINGS_MODULE = "mac.settings"
         DATABASE_URL = "sqlite://db.sqlite3"
