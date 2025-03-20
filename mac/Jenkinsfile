@@ -1,14 +1,14 @@
 pipeline {
     agent {
-        docker {
-            image "python:3.12" // Default agent for most stages
+        docker{
+            image "python:3.12-slim" // Default agent for most stages
             args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
         }
     }
     environment {
         DJANGO_SETTINGS_MODULE = "mac.settings"
         DATABASE_URL = "sqlite://db.sqlite3"
-        DOCKER_IMAGE = "ziasaeeditgeek/django-cicd-project"
+        // DOCKER_IMAGE = "ziasaeeditgeek/django-cicd-project"
     }
     stages {
         stage('Build') {
@@ -29,7 +29,6 @@ pipeline {
         stage('Build and Push Docker Image') {
           environment {
             DOCKER_IMAGE = "ziasaeeditgeek/django-application:${BUILD_NUMBER}"
-            // DOCKERFILE_LOCATION = "spring-boot-app/Dockerfile"
             REGISTRY_CREDENTIALS = credentials('docker-cred')
           }
           steps {
