@@ -49,22 +49,29 @@ pipeline {
           }
         }
         stage('Update Kubernetes Manifest') {
-            steps {
-                withCredentials([string(credentialsId: "github-token", variable: "GITHUB_TOKEN")]) {
-                    sh """
-                    sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_ID}|g' kubernetes/deployment.yml
-                    """
-                    sh """
-                    git config --global user.name "Zia-Saeed"
-                    git config --global user.email "zia.aseh@gmail.com"
-                    git add kubernetes/deployment.yml
-                    git commit -m "Update image tag to ${env.BUILD_ID}"
-                    git push https://${GITHUB_TOKEN}@github.com/Zia-Saeed/Django-CICD-PROJECT HEAD:main
-                    """
+                    steps {
+                        withCredentials([string(credentialsId: "github-token", variable: "GITHUB_TOKEN")]) {
+                            script {
+                                // Checkout the main branch explicitly
+                                sh 'git checkout main'
+        
+                                // Update the image tag in the Kubernetes manifest
+                                sh """
+                                sed -i 's|image: ${env.DOCKER_IMAGE}:.*|image: ${env.DOCKER_IMAGE}:${env.BUILD_NUMBER}|g' kubernetes/deployment.yml
+                                """
+        
+                                // Commit and push changes
+                                sh """
+                                git config --global user.name "Jenkins"
+                                git config --global user.email "jenkins@example.com"
+                                git add kubernetes/deployment.yml
+                                git commit -m "Update image tag to ${env.BUILD_NUMBER}"
+                                git push https://${GITHUB_TOKEN}@github.com/Zia-Saeed/Django-CICD-PROJECT HEAD:main
+                                """
+                            }
+                        }
+                    }
                 }
-            }
-        }
-    }
     post {
         success {
             echo "Pipeline Succeeded!"
