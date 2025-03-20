@@ -20,6 +20,12 @@ pipeline {
             }
         }
         stage('Install Dependencies') {
+            agent{
+                docker {
+                    image "python:3.12-slim"
+                    args "--user root -v /var/run/docker.sock:/var/run/docker.sock"
+                }
+            }
             steps {
                 dir('mac') {
                     sh 'pip install --upgrade pip'
